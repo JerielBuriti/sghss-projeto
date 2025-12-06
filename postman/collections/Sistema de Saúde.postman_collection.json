@@ -1,0 +1,1775 @@
+{
+  "info": {
+    "_postman_id": "29b04afc-8e90-4a6d-8a4d-b611ef8b8a1a",
+    "name": "Sistema de Saúde",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50089168",
+    "_collection_link": "https://jerielmorenoburiti-5963832.postman.co/workspace/00f4ed8f-3a38-49e8-8a0a-3bb4c92bad58/collection/50089168-29b04afc-8e90-4a6d-8a4d-b611ef8b8a1a?action=share&source=collection_link&creator=50089168"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "da8a0c3d-52a7-42f4-aa8c-637944d4bb5e",
+                "exec": [
+                  "pm.test(\"Status 200 - Login bem-sucedido\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Retorna token JWT\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"token\");\r",
+                  "    pm.expect(json.token).to.be.a(\"string\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.collectionVariables.set(\"token\", pm.response.json().token);\r",
+                  "\r",
+                  "pm.test(\"Status 401 - Credenciais inválidas\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Mensagem de erro correta\", function () {\r",
+                  "    pm.expect(pm.response.json().mensagem).to.include(\"Credenciais inválidas\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status 500 - Erro interno\", function () {\r",
+                  "    pm.response.to.have.status(500);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Retorna mensagem de falha interna\", function () {\r",
+                  "    pm.expect(pm.response.json().erro).to.exist;\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "667445d4-28be-44a6-b5fb-be85f535eec2",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "1d882115-f27f-46c6-9c4d-ec9ae030ced9",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"usuario\": \"Thamires\",\r\n  \"senha\": \"123456\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar Usuário",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "c1facec9-534d-45b0-a91c-a2b949ab0fa9",
+                "exec": [
+                  "pm.test(\"Usuário criado\", () => {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "c1f5b69f-acb2-4247-917a-57fb344e7405",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"usuario\": \"Jeriel\",\r\n  \"senha\": \"123456\",\r\n  \"role\": \"admin\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/registrar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "registrar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Renovar Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "d54995fa-6db3-4e2c-a086-5f5fdf3edee9",
+                "exec": [
+                  "pm.test(\"Status 200 - Refresh bem-sucedido\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Retorna novo token JWT\", function () {\r",
+                  "  const json = pm.response.json();\r",
+                  "  pm.expect(json).to.have.property(\"token\").that.is.a(\"string\");\r",
+                  "  \r",
+                  "  pm.environment.set(\"authToken\", json.token);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "f7217d42-2b0d-47bc-8f95-479ea978f3a0",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/refresh",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "4670d234-c396-4308-a5fa-e427432b6aba"
+    },
+    {
+      "name": "Pacientes",
+      "item": [
+        {
+          "name": "Listar Pacientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "cf6bb672-6125-4c6c-af17-61f8c714a921",
+                "exec": [
+                  "pm.test(\"Status 200 - Lista de pacientes\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Retorno é um array\", function () {\r",
+                  "  const json = pm.response.json();\r",
+                  "  pm.expect(json).to.be.an(\"array\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "97375b33-0c27-417f-adb2-4e21878b9d57",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pacientes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pacientes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Paciente",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "b0f05462-d597-4a95-a59c-c73074c8d83a",
+                "exec": [
+                  "pm.test(\"200 Created - Paciente cadastrado\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Paciente tem ID\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.have.property(\"id\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"CPF já cadastrado\", () => {\r",
+                  "    pm.expect(pm.response.json().nome).to.be.a(\"string\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status 400 - Campos obrigatórios ausentes\", function () {\r",
+                  "  pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "pm.test(\"Retorna lista de campos faltando\", function () {\r",
+                  "  const json = pm.response.json();\r",
+                  "  pm.expect(json).to.have.property(\"errors\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "0b24df41-0149-4be6-a171-a013db8bf607",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nome\": \"\",\r\n  \"cpf\": \"42203945813\",\r\n  \"dataNascimento\": \"1988-04-20\",\r\n  \"telefone\": \"11987654321\",\r\n  \"endereco\": \"Rua das Flores, 123 - São Paulo\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pacientes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pacientes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Paciente",
+          "id": "df131150-363e-42fd-a5ff-d32482885f3c",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pacientes/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pacientes",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Paciente",
+          "id": "04a0a38e-917a-4c2c-b03e-06d29dddbc07",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nome\": \"Thamires Oliveira Silva\",\r\n  \"telefone\": \"11988887777\",\r\n  \"endereco\": \"Rua Nova, 222 - São Paulo\",\r\n  \"planoSaude\": \"Bradesco Saúde\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pacientes/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pacientes",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "529121bb-25c6-470c-8a1b-aaf425cbb860",
+                "exec": [
+                  "pm.test(\"Status 204 - Deletado com sucesso\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test(\"Status 404 - Não encontrado\", function () {\r",
+                  "  pm.response.to.have.status(404);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "dff84d6a-3bdb-463a-8e57-24cfc18523ae",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pacientes/6",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pacientes",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "2aec1b30-6863-4412-8eda-49bb494f2c73"
+    },
+    {
+      "name": "Consultas / Agendamentos",
+      "item": [
+        {
+          "name": "Listar Consultas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "595d016c-b745-404a-96b5-edc36b52fa7a",
+                "exec": [
+                  "pm.test(\"Status 200 - Lista de consultas\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Resposta é array\", function () {\r",
+                  "  const json = pm.response.json();\r",
+                  "  pm.expect(json).to.be.an(\"array\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "bd03b36d-758f-451e-8b53-0107c76ae0f7",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/consultas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "consultas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Consulta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "c998a8ec-4907-4853-94c8-bd93f1282e9c",
+                "exec": [
+                  "pm.test(\"Status 201 - Consulta criada\", function () {\r",
+                  "  pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Retorna id da consulta\", function () {\r",
+                  "  const json = pm.response.json();\r",
+                  "  pm.expect(json).to.have.property(\"id\");\r",
+                  "  pm.environment.set(\"createdConsultaId\", json.id);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "8ce144ad-f4ff-44fd-99be-a197750540d5",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"pacienteId\": 2,\r\n  \"profissionalId\":3 ,\r\n  \"data\": \"2025-11-20\",\r\n  \"horario\": \"14:00\",\r\n  \"motivo\": \"Consulta de rotina\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/consultas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "consultas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Consulta",
+          "id": "debdb3cd-32f2-4150-b845-6d0ebd104832",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/consultas/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "consultas",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Consulta",
+          "id": "049cba7a-7964-4b09-8375-50ca91772fe2",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"data\": \"2025-11-21\",\r\n  \"horario\": \"15:00\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/consultas/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "consultas",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Consulta",
+          "id": "d4bf3b9a-d2de-42b5-a107-9bd36a9e5efd",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/consultas/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "consultas",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "1ab3ea77-78a9-4511-92f9-fb314d4fa27d"
+    },
+    {
+      "name": "Profissionais",
+      "item": [
+        {
+          "name": "Listar Profissionais",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "afddd70f-4d25-4e75-874a-bb71e46832b8",
+                "exec": [
+                  "pm.test(\"Status 200 - Lista de profissionais\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Array retornado\", function () {\r",
+                  "  const json = pm.response.json();\r",
+                  "  pm.expect(json).to.be.an(\"array\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "9f6a83d9-c32f-47cf-bf0c-147d206f985b",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/profissionais",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "profissionais"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Profissional",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "5d6e38cc-4549-45ca-80a1-dc0b78c9a86f",
+                "exec": [
+                  "pm.test(\"Status 409 - CRM duplicado\", function () {\r",
+                  "  pm.response.to.have.status(409);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status 201 - Profissional criado\", function () {\r",
+                  "  pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Retorna id e crm\", function () {\r",
+                  "  const json = pm.response.json();\r",
+                  "  pm.expect(json).to.have.property(\"id\");\r",
+                  "  pm.expect(json).to.have.property(\"crm\", \"CRM12345\");\r",
+                  "  pm.environment.set(\"createdProfissionalId\", json.id);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "b5dbf20a-510c-4f99-8b94-9ccf46952a92",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nome\": \"Dr. Antônio Souza\",\r\n  \"email\": \"antonio@sghss.com\",\r\n  \"senha\": \"123456\",\r\n  \"especialidade\": \"Cardiologista\",\r\n  \"crm\": \"123456-SP\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/profissionais",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "profissionais"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Profissional",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "cdb76321-5b2b-4894-99aa-a850822a953d",
+                "exec": [
+                  "pm.test(\"Status 200 - Profissional encontrado\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test(\"Status 404 - Não encontrado\", function () {\r",
+                  "  pm.response.to.have.status(404);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "e6cf697c-faf3-45f7-83ff-36146154c706",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/profissionais/4",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "profissionais",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Profissional",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "b60823f9-8d21-4c8a-aa73-76f29595aa32",
+                "exec": [
+                  "pm.test(\"Status 200 - Atualizado\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Verifica nome atualizado\", function () {\r",
+                  "  const json = pm.response.json();\r",
+                  "  pm.expect(json).to.have.property(\"nome\", \"Dr. Atualizado\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status 404 - Profissional não existe\", function () {\r",
+                  "  pm.response.to.have.status(404);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "9cdc4d42-759b-4dfe-9870-bd05facd7eda",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nome\": \"Dr. Antônio F. Souza\",\r\n  \"especialidade\": \"Cardiologia\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/profissionais/4",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "profissionais",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Profissional",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "4e889381-a859-4e9c-ac8d-8d30fe17b901",
+                "exec": [
+                  "pm.test(\"Status 204 - Profissional deletado\", function () {\r",
+                  "  pm.response.to.have.status(204);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "c6dbf5d9-e242-4835-8576-9f016c7859cc",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/profissionais/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "profissionais",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "086036bf-c036-44f3-966c-65d128c4e8dc"
+    },
+    {
+      "name": "Prontuários",
+      "item": [
+        {
+          "name": "Criar Prontuário",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "ff4824c3-40eb-4418-bd30-d68b81750477",
+                "exec": [
+                  "pm.test(\"Status 201 - Prontuário criado\", function () {\r",
+                  "  pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Retorna id do prontuário\", function () {\r",
+                  "  const json = pm.response.json();\r",
+                  "  pm.expect(json).to.have.property(\"id\");\r",
+                  "  pm.environment.set(\"createdProntuarioId\", json.id);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status 404 - Paciente não encontrado\", function () {\r",
+                  "  pm.response.to.have.status(404);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "f56ffa0b-e617-4228-b05e-58c43f9b6862",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"pacienteId\": 2,\r\n  \"profissionalId\": 3,\r\n  \"texto\": \"Paciente apresenta sintomas gripais. Prescrito repouso.\",\r\n  \"data\": \"2025-11-18\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/prontuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "prontuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Prontuário",
+          "id": "21886be5-ffe5-4472-a011-6d8d3f6b3ba5",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/prontuarios/paciente/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "prontuarios",
+                "paciente",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Prontuário",
+          "id": "50e25259-02bf-4803-976d-c85f9ffbc9a4",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"profissionalId\": 2,\r\n  \"descricao\": \"Paciente evoluiu bem. Tosse reduziu e febre cessou. Mantido hidratação e repouso.\",\r\n  \"data\": \"2025-11-19\",\r\n  \"examesSolicitados\": [\r\n    {\r\n      \"nome\": \"Hemograma completo\",\r\n      \"dataSolicitacao\": \"2025-11-19\"\r\n    },\r\n    {\r\n      \"nome\": \"Raio-X do tórax\",\r\n      \"dataSolicitacao\": \"2025-11-19\"\r\n    }\r\n  ],\r\n  \"diagnostico\": \"Infecção viral leve\",\r\n  \"observacoes\": \"Caso piora, retornar imediatamente.\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/prontuarios/4",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "prontuarios",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Prontuário",
+          "id": "10c6a931-0e13-460f-86d6-651dc4e3bca7",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/prontuarios/5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "prontuarios",
+                "5"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "0b1798ed-7b4d-4077-98f8-e6e115ba7534"
+    },
+    {
+      "name": "Prescrições",
+      "item": [
+        {
+          "name": "Listar Prescrições",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "832b454d-320c-40f8-a251-d472fec3947c",
+                "exec": [
+                  "pm.test(\"Status 200 - Lista prescrições\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Retorno é array\", function () {\r",
+                  "  const json = pm.response.json();\r",
+                  "  pm.expect(json).to.be.an(\"array\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "91bcb24c-097b-404e-8f10-2849dc9f9cb1",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/prescricoes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "prescricoes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Prescrição",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "25614426-7669-4078-a396-e103b1f8ed9e",
+                "exec": [
+                  "pm.test(\"Status 200 - Prescrição criada\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status 404 - Profissional não autorizado\", function () {\r",
+                  "  pm.response.to.have.status(404);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "fa5d5724-d16d-4ff9-9b64-67ba85fd1b8a",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"pacienteId\": 2,\r\n  \"profissionalId\": 993,\r\n  \"medicamentos\": [\r\n    {\r\n      \"nome\": \"Paracetamol 750mg\",\r\n      \"quantidade\": \"10 comprimidos\",\r\n      \"posologia\": \"Tomar 1 comprimido a cada 8h por 5 dias\"\r\n    }\r\n  ],\r\n  \"observacoes\": \"Evitar bebidas alcoólicas durante o tratamento.\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/prescricoes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "prescricoes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Prescrição",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "a0672fb2-3dd1-4ed9-85fe-2242e0a4051f",
+                "exec": [
+                  "pm.test(\"Status 200 - Prescrição encontrada\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status 404 - Não encontrado\", function () {\r",
+                  "  pm.response.to.have.status(404);\r",
+                  "});\r",
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "5a0f7459-0ebd-4919-8a80-fb9d077a0bc3",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/prescricoes/31",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "prescricoes",
+                "31"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Prescrição",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "ed2156ab-ff2f-40dc-9db9-b0f65aefb4a5",
+                "exec": [
+                  "pm.test(\"Status 200 - Prescrição atualizada\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status 404 - Não encontrado\", function () {\r",
+                  "  pm.response.to.have.status(404);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "068e8305-df6d-4a6b-8bce-2027ea5ffacc",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"profissionalId\": 2,\r\n  \"medicamentos\": [\r\n    {\r\n      \"nome\": \"Paracetamol 750mg\",\r\n      \"quantidade\": \"20 comprimidos\",\r\n      \"posologia\": \"1 comprimido a cada 8h por 5 dias\"\r\n    },\r\n    {\r\n      \"nome\": \"Benegripe\",\r\n      \"quantidade\": \"10 sachês\",\r\n      \"posologia\": \"1 sachê à noite por 3 dias\"\r\n    }\r\n  ],\r\n  \"observacoes\": \"Caso apresente febre acima de 38.5°C, retornar ao hospital.\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/prescricoes/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "prescricoes",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Prescrição",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "5fb289b9-ee16-4807-bd60-acf9c9a51bcc",
+                "exec": [
+                  "pm.test(\"Status 200 - Prescrição deletada\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status 404 - Não encontrado\", function () {\r",
+                  "  pm.response.to.have.status(404);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "c186a3e4-8662-43f7-abc6-dad8a2820881",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/prescricoes/32",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "prescricoes",
+                "32"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "ff56c56b-dafa-485c-ade7-ce1d7f6de3b9"
+    },
+    {
+      "name": "Internações",
+      "item": [
+        {
+          "name": "Criar leito",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "60e40797-eb6b-4a00-b2cc-f0c5630dedfb",
+                "exec": [
+                  "pm.test(\"Status 200 - Leito criado\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "2b0e4c80-58b0-4dad-b860-fe76e5962646",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"codigo\": \"203B\",\r\n  \"descricao\": \"Enfermaria 2\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/internacoes/leitos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "internacoes",
+                "leitos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar leitos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "c7b82b34-d206-4465-b084-d6fe8820bcd0",
+                "exec": [
+                  "pm.test(\"Status 200 - Lista de leitos\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Retorno é array\", function () {\r",
+                  "  const json = pm.response.json();\r",
+                  "  pm.expect(json).to.be.an(\"array\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "4affe1b4-7d99-4430-8634-ef809fbdb4c7",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/internacoes/leitos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "internacoes",
+                "leitos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Internar paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "ca69b0b3-23a8-43a1-aa14-cf449a71b51c",
+                "exec": [
+                  "pm.test(\"Status 200 - Internação criada\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status 409 - Leito ocupado\", function () {\r",
+                  "  pm.response.to.have.status(409);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "94e47cae-d5ce-4361-947d-6801a17f482e",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"pacienteId\": 19,\r\n  \"leitoId\": 5\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/internacoes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "internacoes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Internações",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "e6835c40-0bbc-48da-80b9-e445d1df5b5b",
+                "exec": [
+                  "pm.test(\"Status 200 - Lista internações\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Retorno é array\", function () {\r",
+                  "  const json = pm.response.json();\r",
+                  "  pm.expect(json).to.be.an(\"array\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "2fb2bc5a-aacf-4b16-9e43-998d7873684c",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/internacoes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "internacoes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Dar alta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "5844662c-a6db-4a9e-8733-c95334c2a71e",
+                "exec": [
+                  "pm.test(\"Status 200 - Alta registrada\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status 404 - Paciente não internado\", function () {\r",
+                  "  pm.response.to.have.status(404);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "68a427d8-e495-4b14-b7a0-fa67eeb8d2d7",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"dataSaida\": \"2025-11-21\",\r\n  \"relatorioAlta\": \"Paciente estável e liberado para acompanhamento ambulatorial.\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/internacoes/78/alta",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "internacoes",
+                "78",
+                "alta"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Internação",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "958021bb-bf14-4692-a0c6-74d4560dedaa",
+                "exec": [
+                  "pm.test(\"Status 200 - Internação deletada\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status 404 - Não encontrado\", function () {\r",
+                  "  pm.response.to.have.status(404);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "bd04009a-eeea-4b39-8285-a89a354e9e8f",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/internacoes/37",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "internacoes",
+                "37"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "1bc1fd03-e0ab-4cf0-b6f2-892f1572fe8c"
+    }
+  ],
+  "variable": [
+    {
+      "id": "80febc1b-efdc-439c-a3c2-b56e173d0de6",
+      "key": "token",
+      "value": ""
+    }
+  ]
+}
